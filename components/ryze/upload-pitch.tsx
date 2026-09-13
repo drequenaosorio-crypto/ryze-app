@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from 'react'
+import { createClient } from '@supabase/supabase-js'
 
 export default function UploadPitch({ onUploaded }: { onUploaded?: () => void }) {
   const [file, setFile] = useState<File | null>(null)
@@ -22,38 +23,59 @@ export default function UploadPitch({ onUploaded }: { onUploaded?: () => void })
     setUploading(true)
     setProgress(0)
 
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('caption', caption)
-    formData.append('handle', handle)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    if (!supabaseUrl || !supabaseKey) {
+      setUploading(false)
+      return
+    }
 
-    // Use XHR to track progress
+    const fileName = `${Date.now()}_${file.name}`
+    const uploadUrl = `${supabaseUrl.replace(/\/+$/, '')}/storage/v1/object/pitches/${fileName}`
+
+    // Upload directly with XMLHttpRequest to track progress
     const xhr = new XMLHttpRequest()
-    xhr.open('POST', '/api/upload')
+    xhr.open('PUT', uploadUrl)
+    xhr.setRequestHeader('Authorization', `Bearer ${supabaseKey}`)
+    xhr.setRequestHeader('Content-Type', file.type)
+
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
         const percent = Math.round((e.loaded / e.total) * 100)
         setProgress(percent)
       }
     }
-    xhr.onload = () => {
+
+    xhr.onload = async () => {
       setUploading(false)
       setProgress(100)
       if (xhr.status >= 200 && xhr.status < 300) {
-        setFile(null)
-        setPreview(null)
-        setCaption('')
-        setHandle('')
-        if (onUploaded) onUploaded()
+        const publicUrl = `${supabaseUrl.replace(/\/+$/, '')}/storage/v1/object/public/pitches/${fileName}`
+        // Insert record into DB using supabase-js client (anon key)
+        try {
+          const supabase = createClient(supabaseUrl, supabaseKey)
+          const { error } = await supabase.from('pitches').insert({ video_url: publicUrl, caption, handle })
+          if (!error) {
+            setFile(null)
+            setPreview(null)
+            setCaption('')
+            setHandle('')
+            if (onUploaded) onUploaded()
+          }
+        } catch (err) {
+          // silent
+        }
       } else {
-        console.error('Upload failed', xhr.responseText)
+        // silent
       }
     }
+
     xhr.onerror = () => {
       setUploading(false)
-      console.error('Upload error')
+      // silent
     }
-    xhr.send(formData)
+
+    xhr.send(file)
   }
 
   return (

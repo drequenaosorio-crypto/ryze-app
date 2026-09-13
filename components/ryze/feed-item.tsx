@@ -4,6 +4,26 @@ import { Heart, MessageCircle, Bookmark, Share2, Music2, Plus, Check } from "luc
 export function FeedItem({ pitch }: { pitch: any }) {
   const [isLiked, setIsLiked] = useState(false)
   const [conectado, setConectado] = useState(false)
+  const [likesCount, setLikesCount] = useState<number>(pitch.likes || 0)
+
+  async function toggleLike(e: React.MouseEvent) {
+    e.stopPropagation()
+    try {
+      const res = await fetch('/api/likes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pitchId: pitch.id, userId: 'anonymous' })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setIsLiked(data.liked)
+        setLikesCount(data.likes)
+      }
+    } catch (err) {
+      // silent fail - server logs will capture errors
+    }
+  }
+
   return (
     <section className="relative h-screen w-full snap-start overflow-hidden bg-black">
       <div className="absolute inset-0 bg-zinc-900">
@@ -15,7 +35,7 @@ export function FeedItem({ pitch }: { pitch: any }) {
         <button onClick={(e)=>{e.stopPropagation(); setConectado(!conectado)}} className="pointer-events-auto relative z-20 -mt-2 flex size-5 items-center justify-center rounded-full bg-[#8A2BE2]">{conectado? <Check className="size-3 text-white"/> : <Plus className="size-3 text-white"/>}</button>
       </div>
       <div className="absolute bottom-24 right-2 flex flex-col items-center gap-6">
-        <button onClick={(e)=>{e.stopPropagation(); setIsLiked(!isLiked)}} className="pointer-events-auto relative z-20 flex flex-col items-center gap-1"><Heart className={isLiked? "size-8 fill-[#8A2BE2] text-[#8A2BE2]" : "size-8 text-white"} /><span className="text-xs text-white">{pitch.likes || 0}</span></button>
+        <button onClick={toggleLike} className="pointer-events-auto relative z-20 flex flex-col items-center gap-1"><Heart className={isLiked? "size-8 fill-[#8A2BE2] text-[#8A2BE2]" : "size-8 text-white"} /><span className="text-xs text-white">{likesCount}</span></button>
         <button onClick={(e)=>e.stopPropagation()} className="pointer-events-auto relative z-20"><MessageCircle className="size-8 text-white" /></button>
         <button onClick={(e)=>e.stopPropagation()} className="pointer-events-auto relative z-20"><Bookmark className="size-8 text-white" /></button>
         <button onClick={(e)=>e.stopPropagation()} className="pointer-events-auto relative z-20"><Share2 className="size-8 text-white" /></button>
