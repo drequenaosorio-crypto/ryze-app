@@ -7,10 +7,10 @@ export default function Page() {
   const [saved, setSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [likes, setLikes] = useState(12500);
-  const videoRef = useRef(null);
+  const videoRef = useRef(null) as any;
 
   function toggleAudio() {
-    const v = videoRef.current;
+    const v = videoRef.current as any;
     if (v) {
       v.muted =!v.muted;
       setMuted(v.muted);
@@ -103,7 +103,7 @@ export default function Page() {
                 <h3 className="text-white font-bold">348 comentarios</h3>
                 <button onClick={() => setShowComments(false)} className="text-white text-xl">X</button>
               </div>
-              <p className="text-sm text-white/80">@carlaemprende - 3 errores que cometi...</p>
+              <p className="text-sm text-white/80">@carlaemprende - 3 errores que cometi al lanzar mi startup 🔥</p>
             </div>
           </div>
         )}
