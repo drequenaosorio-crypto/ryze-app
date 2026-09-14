@@ -2,10 +2,9 @@
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="relative w-full max-w-[400px] aspect-[9/16] bg-zinc-900 rounded-[32px] overflow-hidden shadow-2xl border border-zinc-800">
+    <main className="min-h-screen bg-black flex items-center justify-center">
+      <div className="relative w-full h-[100dvh] md:h-screen md:max-w-[430px] md:aspect-[9/16] md:rounded-[36px] overflow-hidden bg-black">
 
-        {/* VIDEO HD - TU VIDEO */}
         <video
           autoPlay
           loop
@@ -13,21 +12,15 @@ export default function Home() {
           playsInline
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
-          src="/20260531_133116.mp4"
+          src="/ryze-promo.mp4"
         />
 
-        {/* Degradado para que se lea el texto */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-        {/* TEXTO ENCIMA */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <h1 className="text-4xl font-black leading-none tracking-tight">
-            RYZE
-          </h1>
-          <p className="text-sm text-white/70 mt-2">
-            Swipe. Match. Rise.
-          </p>
-          <button className="mt-4 w-full bg-white text-black font-bold py-3 rounded-full">
+        <div className="absolute bottom-0 left-0 right-0 p-8 pb-12">
+          <h1 className="text-white text-[44px] font-black tracking-tight leading-none">RYZE</h1>
+          <p className="text-white/60 text-[16px] mt-2 font-medium">Swipe. Match. Rise.</p>
+          <button className="mt-6 w-full bg-white text-black h-[56px] rounded-full font-bold text-[17px]">
             Get Started
           </button>
         </div>
