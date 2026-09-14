@@ -15,7 +15,7 @@ export default function Home() {
       
       <div style={{ textAlign: 'center' }}>
         <h1 style={{ fontSize: '62px', fontWeight: '900', letterSpacing: '8px', margin: 0 }}>RYZE</h1>
-        <p style={{ fontSize: '19px', letterSpacing: '6px', marginTop: '15px', lineHeight: '28px' }}>
+        <p style={{ fontSize: '19px', letterSpacing: '6px', marginTop: '15px', lineHeight: '28px', textAlign: 'center' }}>
           SALES • JOBS • MEET<br/>PEOPLE
         </p>
       </div>
@@ -26,10 +26,7 @@ export default function Home() {
           border: '1px solid white',
           borderRadius: '30px',
           padding: '10px 24px',
-          fontSize: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
+          fontSize: '16px'
         }}>
           Tap for Sound 🔊
         </div>
@@ -51,4 +48,10 @@ export default function Home() {
           }}
         >
           Get Started
-        </a
+        </a>
+
+        <p style={{ color: '#888', fontSize: '14px' }}>ryzeofficial-app.com</p>
+      </div>
+    </div>
+  );
+}
