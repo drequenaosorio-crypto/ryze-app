@@ -7,33 +7,36 @@ export default function Page() {
   const [saved, setSaved] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [likes, setLikes] = useState(12500);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef(null);
 
-  const toggleAudio = () => {
-    if (videoRef.current) {
-      videoRef.current.muted =!videoRef.current.muted;
-      setMuted(videoRef.current.muted);
+  function toggleAudio() {
+    const v = videoRef.current;
+    if (v) {
+      v.muted =!v.muted;
+      setMuted(v.muted);
     }
-  };
+  }
 
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikes(liked? likes - 1 : likes + 1);
-  };
-
-  const handleShare = async () => {
-    const url = "https://www.ryzeofficial-app.com";
-    if (navigator.share) {
-      await navigator.share({ title: "RYZE", text: "Mira esto en Ryze", url });
+  function handleLike() {
+    if (liked) {
+      setLikes(likes - 1);
     } else {
-      await navigator.clipboard.writeText(url);
-      alert("¡Link copiado! " + url);
+      setLikes(likes + 1);
     }
-  };
+    setLiked(!liked);
+  }
 
-  const handleSave = () => {
-    setSaved(!saved);
-  };
+  async function handleShare() {
+    const url = "https://www.ryzeofficial-app.com";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "RYZE", text: "Mira esto en Ryze", url: url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("Link copiado: " + url);
+      }
+    } catch (e) {}
+  }
 
   return (
     <main className="min-h-screen bg-black flex justify-center items-center">
@@ -52,19 +55,64 @@ export default function Page() {
 
         {muted && (
           <button onClick={toggleAudio} className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full">
-            🔊 Toca para audio
+            Toca para audio
           </button>
         )}
 
-        {/* BOTONES FUNCIONALES */}
         <div className="absolute right-2 bottom-28 flex flex-col items-center gap-5">
           <button onClick={handleLike} className="flex flex-col items-center">
-            <div className={`w-12 h-12 rounded-full backdrop-blur flex items-center justify-center ${liked? 'bg-red-500' : 'bg-white/15'}`}>
-              <svg className={`w-7 h-7 ${liked? 'fill-white text-white' : 'text-white'}`} fill={liked? "white" : "none"} stroke="white" viewBox="0 0 24 24"><path strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${liked? 'bg-red-500' : 'bg-white/15'}`}>
+              <span className="text-xl text-white">{liked? '❤️' : '🤍'}</span>
             </div>
             <span className="text-white text-xs mt-1 font-bold">{(likes/1000).toFixed(1)}k</span>
           </button>
 
           <button onClick={() => setShowComments(true)} className="flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21
+            <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center">
+              <span className="text-xl">💬</span>
+            </div>
+            <span className="text-white text-xs mt-1">348</span>
+          </button>
+
+          <button onClick={() => setSaved(!saved)} className="flex flex-col items-center">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${saved? 'bg-yellow-400' : 'bg-white/15'}`}>
+              <span className="text-xl">{saved? '🔖' : '📑'}</span>
+            </div>
+            <span className="text-white text-xs mt-1">{saved? 'Guardado' : 'Guardar'}</span>
+          </button>
+
+          <button onClick={handleShare} className="flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center">
+              <span className="text-xl">↗️</span>
+            </div>
+            <span className="text-white text-xs mt-1">Compartir</span>
+          </button>
+
+          <button onClick={() => alert('Audio original de RYZE guardado')} className="flex flex-col items-center">
+            <div className="w-12 h-12 rounded-full bg-white/20 border-2 border-white flex items-center justify-center">
+              <span className="text-white">♫</span>
+            </div>
+            <span className="text-white text-[10px] mt-1">Usar audio</span>
+          </button>
+        </div>
+
+        {showComments && (
+          <div className="absolute inset-0 bg-black/60 z-20 flex items-end">
+            <div className="w-full bg-zinc-900 rounded-t-[24px] p-4 h-[55%]">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-white font-bold">348 comentarios</h3>
+                <button onClick={() => setShowComments(false)} className="text-white text-xl">X</button>
+              </div>
+              <p className="text-sm text-white/80">@carlaemprende - 3 errores que cometi...</p>
+            </div>
+          </div>
+        )}
+
+        <div className="absolute bottom-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
+          <p className="text-white font-bold">@ryzeofficial</p>
+          <h1 className="text-white text-center text-xl font-bold tracking-[0.5em] mt-3">RYZE</h1>
+        </div>
+      </div>
+    </main>
+  );
+}
