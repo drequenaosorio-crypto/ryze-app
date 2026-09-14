@@ -1,34 +1,38 @@
-"use client"
+"use client";
 
 export default function Home() {
   return (
-    <div className="h-screen bg-black text-white overflow-y-scroll snap-y snap-mandatory">
-      <div className="sticky top-0 z-10 bg-black p-4 flex justify-between items-center border-b border-zinc-800">
-        <h1 className="font-black text-xl">RYZE</h1>
-        <div className="w-8 h-8 bg-white rounded-full"></div>
-      </div>
+    <main className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="relative w-full max-w-[400px] aspect-[9/16] bg-zinc-900 rounded-[32px] overflow-hidden shadow-2xl border border-zinc-800">
 
-      <div className="relative h-[calc(100vh-65px)] snap-start bg-zinc-900">
+        {/* VIDEO HD - TU VIDEO */}
         <video
-          src="/pitch1.mp4"
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // si no tienes pitch1.mp4, usa el de prueba
-            (e.target as HTMLVideoElement).src = "https://www.w3schools.com/html/mov_bbb.mp4"
-          }}
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/20260531_133116.mp4"
         />
-        <div className="absolute bottom-0 left-0 w-full p-4 flex justify-between items-end bg-gradient-to-t from-black to-transparent">
-          <div>
-            <p className="font-bold">@drequenaosorio</p>
-            <p className="text-sm">Mi primer pitch 🔥</p>
-          </div>
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">♡ 124</div>
+
+        {/* Degradado para que se lea el texto */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+        {/* TEXTO ENCIMA */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h1 className="text-4xl font-black leading-none tracking-tight">
+            RYZE
+          </h1>
+          <p className="text-sm text-white/70 mt-2">
+            Swipe. Match. Rise.
+          </p>
+          <button className="mt-4 w-full bg-white text-black font-bold py-3 rounded-full">
+            Get Started
+          </button>
         </div>
+
       </div>
-    </div>
-  )
+    </main>
+  );
 }
