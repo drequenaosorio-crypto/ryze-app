@@ -9,14 +9,15 @@ export default function Home() {
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
-          src="/20260531_133116.mp4"
+          src="/VID-20260913-WA3041.mp4"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 pb-10">
-          <h1 className="text-white text-[44px] font-black">RYZE</h1>
-          <p className="text-white/60 mt-1">Swipe. Match. Rise.</p>
-          <button className="mt-6 w-full bg-white text-black h-[56px] rounded-full font-bold">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-8 pb-12">
+          <h1 className="text-white text-[44px] font-black leading-none">RYZE</h1>
+          <p className="text-white/60 mt-2">Swipe. Match. Rise.</p>
+          <button className="mt-6 w-full bg-white text-black h-[56px] rounded-full font-bold text-[17px]">
             Get Started
           </button>
         </div>
