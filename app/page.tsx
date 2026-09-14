@@ -1,56 +1,50 @@
 "use client"
-import { useState } from "react"
-import { Heart, MessageCircle, Bookmark, Share2, Music2 } from "lucide-react"
+import { useRef, useEffect } from "react"
+import { Heart, MessageCircle, Bookmark, Share2 } from "lucide-react"
 
-const pitches = [
-  { id: 1, user: "drequenaosorio", song: "Mi primer pitch 🔥", likes: 124, audio: "Original Sound" },
-  { id: 2, user: "ryze_user", song: "Beat que rompe", likes: 89, audio: "Trap Beat" },
-  { id: 3, user: "producer_x", song: "Nuevo drop", likes: 210, audio: "Reggaeton Type" },
-]
+export default function Page() {
+  const refs = useRef<(HTMLVideoElement | null)[]>([])
+  useEffect(() => {
+    const obs = new IntersectionObserver((e) => {
+      e.forEach((en) => {
+        const v = en.target as HTMLVideoElement
+        if (en.isIntersecting) v.play().catch(()=>{})
+        else v.pause()
+      })
+    }, { threshold: 0.6 })
+    refs.current.forEach(v => v && obs.observe(v))
+    return () => obs.disconnect()
+  }, [])
 
-export default function Home() {
+  const videos = [
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+  ]
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center">
-      {/* Header */}
-      <div className="w-full max-w-[430px] p-4 flex justify-between items-center border-b border-zinc-800 sticky top-0 bg-black z-10">
-        <h1 className="text-2xl font-black tracking-tighter">RYZE</h1>
-        <div className="w-8 h-8 bg-white rounded-full"></div>
+    <div className="h-screen w-screen bg-black overflow-y-scroll snap-y snap-mandatory">
+      <div className="sticky top-0 z-10 bg-black p-4 flex justify-between border-b border-zinc-900 w-full max-w-[430px] mx-auto">
+        <p className="text-white font-black text-xl">RYZE</p>
+        <div className="w-7 h-7 bg-white rounded-full" />
       </div>
-
-      {/* Feed */}
-      <div className="w-full max-w-[430px]">
-        {pitches.map((pitch) => (
-          <div key={pitch.id} className="w-full h-[85vh] relative border-b border-zinc-800 flex flex-col justify-end p-4 bg-zinc-900 mb-1">
-            {/* Contenido del pitch */}
-            <div className="absolute inset-0 bg-gradient-to-b from-zinc-800 to-black opacity-50"></div>
-
-            <div className="relative z-10 flex justify-between items-end">
-              <div>
-                <p className="font-bold">@{pitch.user}</p>
-                <p className="text-sm mt-1">{pitch.song}</p>
-                <div className="flex items-center gap-2 mt-3 text-sm">
-                  <Music2 size={14} />
-                  <span>{pitch.audio}</span>
-                </div>
-              </div>
-
-              {/* Botones derecha */}
-              <div className="flex flex-col gap-6 items-center">
-                <button className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><Heart /></div>
-                  <span className="text-xs">{pitch.likes}</span>
-                </button>
-                <button className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><MessageCircle /></div>
-                  <span className="text-xs">12</span>
-                </button>
-                <button className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><Bookmark /></button>
-                <button className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><Share2 /></button>
-              </div>
+      {videos.map((src, i) => (
+        <div key={i} className="h-[calc(100vh-56px)] w-full max-w-[430px] mx-auto relative snap-start">
+          <video ref={el => { refs.current[i] = el }} src={src} loop muted playsInline className="w-full h-full object-cover" />
+          <div className="absolute bottom-0 w-full p-4 flex justify-between items-end bg-gradient-to-t from-black/80 to-transparent">
+            <div>
+              <p className="text-white font-bold">@drequenaosorio</p>
+              <p className="text-white text-sm">Mi primer pitch 🔥</p>
+            </div>
+            <div className="flex flex-col gap-4">
+              <div className="text-center"><div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><Heart className="text-white" /></div><p className="text-white text-xs mt-1">124</p></div>
+              <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><MessageCircle className="text-white" /></div>
+              <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><Bookmark className="text-white" /></div>
+              <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center"><Share2 className="text-white" /></div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   )
 }
