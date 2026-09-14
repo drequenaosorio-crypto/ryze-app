@@ -2,10 +2,8 @@
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
-
-      {/* VIDEO RYZE */}
-      <div className="relative w-full max-w-[380px] aspect-[9/16] rounded-[32px] overflow-hidden bg-black border border-white/10">
+    <main className="min-h-screen bg-black flex items-center justify-center p-0">
+      <div className="relative w-full max-w-[430px] h-[100dvh] bg-black overflow-hidden">
         <video
           src="/ryze-promo.mp4"
           autoPlay
@@ -14,19 +12,13 @@ export default function Page() {
           playsInline
           className="w-full h-full object-cover"
         />
+        {/* Glow RYZE */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
-        {/* 5 ICONOS FLOTANTES COMO RYZE */}
-        <div className="absolute bottom-6 left-0 right-0 flex justify-around px-6">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-xl">☕</div>
-          <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-xl">🍄</div>
-          <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-xl">⚡</div>
-          <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-xl">🧠</div>
-          <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-xl">💤</div>
+        <div className="absolute bottom-8 left-0 right-0 text-center">
+          <h1 className="text-white font-black tracking-[0.3em] text-2xl drop-shadow-[0_0_15px_rgba(100,150,255,0.8)]">RYZE</h1>
         </div>
       </div>
-
-      <h1 className="text-white text-2xl font-bold mt-6">RYZE</h1>
-      <p className="text-white/60 text-sm">Tu video ya está activo</p>
     </main>
   );
 }
