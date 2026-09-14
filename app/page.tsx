@@ -1,30 +1,54 @@
-'use client'
-
-export default function Page() {
+export default function Home() {
   return (
-    <main style={{background:'black', height:'100vh', width:'100vw', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', padding:'60px 20px', textAlign:'center'}}>
+    <div style={{
+      backgroundColor: 'black',
+      height: '100vh',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '80px 20px 30px 20px',
+      color: 'white',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       
-      <div>
-        <h1 style={{color:'white', fontSize:'55px', fontWeight:'900', letterSpacing:'8px', margin:0}}>RYZE</h1>
-        <p style={{color:'white', letterSpacing:'6px', fontSize:'18px', marginTop:'10px'}}>SALES • JOBS • MEET PEOPLE</p>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: '62px', fontWeight: '900', letterSpacing: '8px', margin: 0 }}>RYZE</h1>
+        <p style={{ fontSize: '19px', letterSpacing: '6px', marginTop: '15px', lineHeight: '28px' }}>
+          SALES • JOBS • MEET<br/>PEOPLE
+        </p>
       </div>
 
-      <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'15px'}}>
-        <div style={{color:'white', border:'1px solid white', borderRadius:'20px', padding:'6px 18px', fontSize:'14px'}}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '18px', width: '100%', maxWidth: '320px' }}>
+        
+        <div style={{
+          border: '1px solid white',
+          borderRadius: '30px',
+          padding: '10px 24px',
+          fontSize: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
           Tap for Sound 🔊
         </div>
 
-        <a 
-          href="https://wa.me/18622799086?text=Hi%20RYZE%20I%20want%20to%20join"
+        <a
+          href="https://wa.me/18622799086?text=Hola%20RYZE%20quiero%20unirme"
           target="_blank"
-          style={{background:'white', color:'black', padding:'18px 60px', borderRadius:'30px', fontWeight:'bold', fontSize:'18px', textDecoration:'none'}}
+          style={{
+            backgroundColor: 'white',
+            color: 'black',
+            width: '100%',
+            padding: '18px 0px',
+            borderRadius: '50px',
+            fontWeight: 'bold',
+            fontSize: '20px',
+            textAlign: 'center',
+            textDecoration: 'none',
+            display: 'block'
+          }}
         >
           Get Started
-        </a>
-
-        <p style={{color:'gray', fontSize:'12px'}}>ryzeofficial-app.com</p>
-      </div>
-
-    </main>
-  )
-}
+        </a
