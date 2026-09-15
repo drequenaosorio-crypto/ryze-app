@@ -10,17 +10,12 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  if (searchParams.get("clear") === "1") {
-    await redis.del("waitlist");
-    return NextResponse.json({ ok: true, message: "Borrado" });
-  }
+export async function GET() {
   const list = await redis.lrange("waitlist", 0, -1);
   return NextResponse.json(list.map((s: any) => JSON.parse(s as string)));
 }
 
 export async function DELETE() {
   await redis.del("waitlist");
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, message: "Borrado" });
 }
