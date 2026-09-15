@@ -1,36 +1,26 @@
-import { Redis } from "@upstash/redis"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
 
-const redis = Redis.fromEnv()
+const redis = Redis.fromEnv();
 
 export async function POST(req: Request) {
-  try {
-    const { instagram, email } = await req.json()
-    if (!instagram && !email) {
-      return NextResponse.json({ error: "falta IG" }, { status: 400 })
-    }
-    const data = { 
-      instagram: instagram || "", 
-      email: email || "", 
-      date: new Date().toISOString() 
-    }
-    await redis.lpush("waitlist", JSON.stringify(data))
-    return NextResponse.json({ success: true, data })
-  } catch (e: any) {
-    console.error(e)
-    return NextResponse.json({ error: e.message }, { status: 500 })
-  }
+  const { email, ig } = await req.json();
+  const entry = { email, ig, date: new Date().toISOString() };
+  await redis.lpush("waitlist", JSON.stringify(entry));
+  return NextResponse.json({ ok: true });
 }
 
-export async function GET() {
-  try {
-    const list = await redis.lrange("waitlist", 0, 100)
-    const parsed = list.map((item: any) => {
-      try { return typeof item === 'string' ? JSON.parse(item) : item } 
-      catch { return item }
-    })
-    return NextResponse.json(parsed)
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message, envs: !!process.env.UPSTASH_REDIS_REST_URL }, { status: 500 })
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  if (searchParams.get("clear") === "1") {
+    await redis.del("waitlist");
+    return NextResponse.json({ ok: true, message: "Borrado" });
   }
+  const list = await redis.lrange("waitlist", 0, -1);
+  return NextResponse.json(list.map((s: any) => JSON.parse(s as string)));
+}
+
+export async function DELETE() {
+  await redis.del("waitlist");
+  return NextResponse.json({ ok: true });
 }
