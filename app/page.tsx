@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function Page() {
   const videoRef = useRef(null);
@@ -15,6 +15,18 @@ export default function Page() {
     { user: "maria_v", text: "Necesito ese audio 😍" },
   ]);
   const [newComment, setNewComment] = useState("");
+
+  // ESTO ES NUEVO: carga los comentarios guardados
+  useEffect(() => {
+    fetch("/api/comments")
+     .then(r => r.json())
+     .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setComments(data);
+        }
+      })
+     .catch(() => {});
+  }, []);
 
   function toggleAudio() {
     const v = videoRef.current;
@@ -34,10 +46,24 @@ export default function Page() {
       alert("Link copiado ✅");
     }
   }
-  function addComment() {
+
+  // ESTO ES NUEVO: ahora guarda en la base de datos
+  async function addComment() {
     if (!newComment.trim()) return;
-    setComments([...comments, { user: "tu", text: newComment }]);
+    const texto = newComment;
     setNewComment("");
+
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: texto }),
+      });
+      const saved = await res.json();
+      setComments((prev) => [...prev, saved]);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (
@@ -86,7 +112,7 @@ export default function Page() {
                 ))}
               </div>
               <div className="flex gap-2 mt-3">
-                <input value={newComment} onChange={e=>setNewComment(e.target.value)} placeholder="Añade un comentario..." className="flex-1 bg-white/10 text-white rounded-full px-4 py-2 text-sm outline-none" />
+                <input value={newComment} onChange={e=>setNewComment(e.target.value)} placeholder="Añade un comentario..." className="flex-1 bg-white/10 text-white rounded-full px-4 py-2 text-sm outline-none" onKeyDown={e=> e.key === 'Enter' && addComment()} />
                 <button onClick={addComment} className="text-[#fe2c55] font-bold text-sm">Enviar</button>
               </div>
             </div>
