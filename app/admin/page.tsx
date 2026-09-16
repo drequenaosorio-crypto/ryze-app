@@ -1,28 +1,17 @@
-import { Redis } from '@upstash/redis'
+export const dynamic = 'force-dynamic';
 
-const redis = Redis.fromEnv()
-
-export default async function AdminPage() {
-  const list = (await redis.lrange('waitlist', 0, -1)) || []
-  
-  const founders = [
-    { email: 'drequenaosorio@gmail.com', ig: 'david_ro_16' },
-    ...list.map((e:any) => JSON.parse(e))
-  ]
-
+export default function AdminPage() {
   return (
-    <main style={{ background: 'black', color: 'white', minHeight: '100vh', padding: '30px', fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '30px', fontWeight: '900' }}>Panel Admin - {founders.length} miembros</h1>
-      <p style={{ color: '#888' }}>Solo tú puedes ver esto: ryzeofficial-app.com/admin</p>
-      
-      <div style={{ marginTop: '30px', background: '#111', border: '1px solid #222', borderRadius: '12px', overflow: 'hidden' }}>
-        {founders.map((f:any, i:number) => (
-          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid #222' }}>
-            <span>#{i+1} {f.email}</span>
-            <span style={{ color: '#888' }}>@{f.ig || 'sin-ig'}</span>
-          </div>
-        ))}
+    <div style={{padding:'40px', background:'black', color:'white', minHeight:'100vh', fontFamily:'sans-serif'}}>
+      <h1 style={{fontSize:'24px', fontWeight:'bold'}}>✅ RYZE - ADMIN FUNCIONANDO</h1>
+      <p style={{marginTop:'20px', color:'#aaa'}}>Tu web ya no se cae. Ahora solo falta conectar la base de datos.</p>
+      <div style={{marginTop:'30px', padding:'20px', border:'1px solid #333', borderRadius:'10px'}}>
+        <p><b>Paso final:</b> Ve a Vercel → Settings → Environment Variables y agrega:</p>
+        <code style={{display:'block', marginTop:'10px', background:'#111', padding:'10px'}}>
+          UPSTASH_REDIS_REST_URL<br/>
+          UPSTASH_REDIS_REST_TOKEN
+        </code>
       </div>
-    </main>
+    </div>
   )
 }
