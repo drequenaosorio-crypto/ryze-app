@@ -1,17 +1,44 @@
-export const dynamic = 'force-dynamic';
+"use client";
+import { useEffect, useState } from "react";
 
 export default function AdminPage() {
+  const [emails, setEmails] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/waitlist/list")
+     .then(res => res.json())
+     .then(data => {
+        setEmails(data.emails || []);
+        setLoading(false);
+      });
+  }, []);
+
+  const downloadCSV = () => {
+    const csv = "Email,Date\n" + emails.map(e => `${e.email},${e.date}`).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ryze-waitlist.csv";
+    a.click();
+  };
+
+  if (loading) return <div className="p-10 text-white bg-black min-h-screen">Cargando correos...</div>;
+
   return (
-    <div style={{padding:'40px', background:'black', color:'white', minHeight:'100vh', fontFamily:'sans-serif'}}>
-      <h1 style={{fontSize:'24px', fontWeight:'bold'}}>✅ RYZE - ADMIN FUNCIONANDO</h1>
-      <p style={{marginTop:'20px', color:'#aaa'}}>Tu web ya no se cae. Ahora solo falta conectar la base de datos.</p>
-      <div style={{marginTop:'30px', padding:'20px', border:'1px solid #333', borderRadius:'10px'}}>
-        <p><b>Paso final:</b> Ve a Vercel → Settings → Environment Variables y agrega:</p>
-        <code style={{display:'block', marginTop:'10px', background:'#111', padding:'10px'}}>
-          UPSTASH_REDIS_REST_URL<br/>
-          UPSTASH_REDIS_REST_TOKEN
-        </code>
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="text-3xl font-bold mb-2">RYZE - Admin</h1>
+      <p className="text-gray-400 mb-6">Total: {emails.length} correos</p>
+      <button onClick={downloadCSV} className="bg-white text-black px-4 py-2 rounded mb-6 font-bold">Descargar CSV</button>
+      <div className="border border-gray-800 rounded">
+        {emails.map((item, i) => (
+          <div key={i} className="flex justify-between p-4 border-b border-gray-800">
+            <span>{item.email}</span>
+            <span className="text-gray-500 text-sm">{item.date}</span>
+          </div>
+        ))}
       </div>
     </div>
-  )
+  );
 }
