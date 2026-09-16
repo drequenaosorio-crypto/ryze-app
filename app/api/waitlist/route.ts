@@ -1,29 +1,30 @@
-import { Redis } from '@upstash/redis'
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
-const redis = Redis.fromEnv()
+export async function POST(req: Request) {
+  try {
+    const { email } = await req.json();
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const FOUNDER = {
-  email: 'drequenaosorio@gmail.com',
-  ig: 'david_ro_16',
-  id: 1
+    if (!email) {
+      return NextResponse.json({ error: "Falta email" }, { status: 400 });
+    }
+
+    // Si no hay Upstash configurado, igual responde OK para no bloquear
+    if (url && token) {
+      const payload = JSON.stringify({ email, date: new Date().toISOString() });
+      await fetch(`${url}/lpush/waitlist/${encodeURIComponent(payload)}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+
+    return NextResponse.json({ success: true, email });
+  } catch (e) {
+    return NextResponse.json({ success: true });
+  }
 }
 
 export async function GET() {
-  const list = (await redis.lrange('waitlist', 0, -1)) || []
-  const all = [FOUNDER, ...list.map((e:any) => JSON.parse(e))]
-  return NextResponse.json({ ok: true, total: all.length, founders: all })
-}
-
-export async function POST(req: Request) {
-  const { email, ig } = await req.json()
-  if (!email) return NextResponse.json({ ok: false }, { status: 400 })
-  
-  // evita duplicados
-  const list = (await redis.lrange('waitlist', 0, -1)) || []
-  const exists = list.some((e:any) => JSON.parse(e).email === email)
-  if (exists) return NextResponse.json({ ok: true, already: true })
-
-  await redis.rpush('waitlist', JSON.stringify({ email, ig, date: new Date().toISOString() }))
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ status: "RYZE API OK" });
 }
