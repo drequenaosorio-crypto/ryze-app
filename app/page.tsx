@@ -1,59 +1,76 @@
-"use client"
-import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+"use client";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-const DICTIONARY: any = {
-  es: { title: "Únete a la lista de espera", ph: "tu@email.com", btn: "Unirme", promo1: "🎁 TRAE A 5 Y RECLAMA AUTOMÁTICAMENTE TU REGALO", promo2: "¡TENEMOS GRANDES SORPRESAS POR LANZAMIENTO!", thanks: "¡Estás dentro!", copy: "Tu link de referido:", copied: "¡Copiado!" },
-  en: { title: "Join the waitlist", ph: "your@email.com", btn: "Join", promo1: "🎁 BRING 5 AND AUTOMATICALLY CLAIM YOUR GIFT", promo2: "WE HAVE BIG SURPRISES FOR LAUNCH!", thanks: "You're in!", copy: "Your referral link:", copied: "Copied!" },
-  pt: { title: "Entre para a lista de espera", ph: "seu@email.com", btn: "Entrar", promo1: "TRAGA 5 E RESGATE SEU PRESENTE AUTOMATICAMENTE", promo2: "TEMOS GRANDES SURPRESAS!", thanks: "Você está dentro!", copy: "Seu link:", copied: "Copiado!" },
-  fr: { title: "Rejoignez la liste d'attente", ph: "votre@email.com", btn: "Rejoindre", promo1: "🎁 APPORTEZ 5 ET RÉCLAMEZ VOTRE CADEAU", promo2: "NOUS AVONS DE GRANDES SURPRISES!", thanks: "Vous êtes dedans!", copy: "Votre lien:", copied: "Copié!" },
-  de: { title: "Tritt der Warteliste bei", ph: "deine@email.com", btn: "Beitreten", promo1: "🎁 BRING 5 MIT UND FORDERE DEIN GESCHENK AN", promo2: "WIR HABEN GROSSE ÜBERRASCHUNGEN!", thanks: "Du bist dabei!", copy: "Dein Link:", copied: "Kopiert!" },
-  it: { title: "Unisciti alla lista d'attesa", ph: "tua@email.com", btn: "Unisciti", promo1: "🎁 PORTA 5 E RICHIEDI IL TUO REGALO", promo2: "ABBIAMO GRANDI SORPRESE!", thanks: "Sei dentro!", copy: "Il tuo link:", copied: "Copiato!" },
-  ja: { title: "ウェイティングリストに参加", ph: "あなたのメール", btn: "参加", promo1: "🎁 5人招待で自動的にギフトをゲット", promo2: "大きなサプライズあり！", thanks: "参加完了！", copy: "紹介リンク：", copied: "コピーしました！" },
-  ru: { title: "Присоединиться к листу ожидания", ph: "твоя@почта.com", btn: "Вступить", promo1: "🎁 ПРИВЕДИ 5 И ПОЛУЧИ ПОДАРОК", promo2: "У НАС БОЛЬШИЕ СЮРПРИЗЫ!", thanks: "Ты внутри!", copy: "Твоя ссылка:", copied: "Скопировано!" },
-}
+const DICT: any = {
+  es: { t: "Únete a la lista de espera", ph: "tu@email.com", btn: "Unirme", p1: "🎁 TRAE A 5 Y RECLAMA AUTOMÁTICAMENTE TU REGALO", p2: "¡TENEMOS GRANDES SORPRESAS POR LANZAMIENTO!", ok: "¡Estás dentro!" },
+  en: { t: "Join the waitlist", ph: "your@email.com", btn: "Join", p1: "🎁 BRING 5 AND AUTOMATICALLY CLAIM YOUR GIFT", p2: "WE HAVE BIG SURPRISES FOR LAUNCH!", ok: "You're in!" },
+  pt: { t: "Entre para a lista de espera", ph: "seu@email.com", btn: "Entrar", p1: "🎁 TRAGA 5 E RESGATE SEU PRESENTE", p2: "TEMOS SURPRESAS!", ok: "Você está dentro!" },
+  fr: { t: "Rejoignez la liste", ph: "votre@email.com", btn: "Rejoindre", p1: "🎁 APPORTEZ 5 ET RÉCLAMEZ VOTRE CADEAU", p2: "GRANDES SURPRISES!", ok: "Vous êtes dedans!" },
+};
 
-function WaitlistForm() {
-  const [lang, setLang] = useState("es")
-  const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [done, setDone] = useState(false)
-  const [referralLink, setReferralLink] = useState("")
-  const searchParams = useSearchParams()
-  const ref = searchParams.get('ref')
+function Form() {
+  const [lang, setLang] = useState("es");
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
+  const [link, setLink] = useState("");
+  const [loading, setLoading] = useState(false);
+  const params = useSearchParams();
+  const ref = params.get("ref");
 
   useEffect(() => {
-    const userLang = navigator.language.slice(0, 2).toLowerCase()
-    if (DICTIONARY[userLang]) setLang(userLang)
-    else setLang("en")
-  }, [])
+    const l = navigator.language.slice(0, 2).toLowerCase();
+    if (DICT[l]) setLang(l);
+    else setLang("en");
+  }, []);
 
-  const t = DICTIONARY[lang] || DICTIONARY["en"]
+  const tr = DICT[lang] || DICT.en;
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault()
-    if (!email) return
-    setLoading(true)
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, ref })
-      })
-      const data = await res.json()
-      if (res.ok) {
-        const link = `${window.location.origin}?ref=${encodeURIComponent(email)}`
-        setReferralLink(link)
-        setDone(true)
-      } else {
-        alert(data.error || 'Error')
-      }
-    } catch (err) {
-      alert('Error de conexión')
+  async function onSubmit(e: any) {
+    e.preventDefault();
+    setLoading(true);
+    const res = await fetch("/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, ref }),
+    });
+    if (res.ok) {
+      setLink(`${window.location.origin}?ref=${email}`);
+      setDone(true);
     }
-    setLoading(false)
+    setLoading(false);
+  }
+
+  if (done) {
+    return (
+      <div style={{ background: "black", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20, color: "white" }}>
+        <h1 style={{ fontSize: 60, fontWeight: 900 }}>RYZE</h1>
+        <h2>{tr.ok}</h2>
+        <p style={{ color: "#facc15", marginTop: 20 }}>{link}</p>
+      </div>
+    );
   }
 
   return (
-    <div style={{ background: 'black', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', textAlign: 'center' }}>
-      <h1 style={{ color: 'white', fontSize: '60px', fontWeight
+    <div style={{ background: "black", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 20, textAlign: "center" }}>
+      <h1 style={{ color: "white", fontSize: 60, fontWeight: 900, letterSpacing: 4, marginBottom: 30 }}>RYZE</h1>
+      <p style={{ color: "white", fontSize: 20, marginBottom: 30 }}>{tr.t}</p>
+      <form onSubmit={onSubmit} style={{ display: "flex", gap: 10, maxWidth: 450, width: "100%", marginBottom: 30 }}>
+        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder={tr.ph} type="email" required style={{ flex: 1, padding: 18, borderRadius: 12, border: "none" }} />
+        <button type="submit" style={{ background: "white", color: "black", padding: "0 30px", borderRadius: 12, fontWeight: "bold" }}>{loading? "..." : tr.btn}</button>
+      </form>
+      <div style={{ border: "1px solid #facc15", borderRadius: 16, padding: 20, maxWidth: 450, width: "100%" }}>
+        <p style={{ color: "#facc15", fontWeight: 900, margin: 0 }}>{tr.p1}</p>
+        <p style={{ color: "white", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{tr.p2}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div style={{ background: "black", minHeight: "100vh" }} />}>
+      <Form />
+    </Suspense>
+  );
+}
