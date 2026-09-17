@@ -1,7 +1,19 @@
+import { NextResponse } from 'next/server'
+
 export async function GET() {
-  const { getRequestContext } = await import('@cloudflare/next-on-pages')
-  const { env } = getRequestContext()
-  await env.RYZE_WAITLIST.delete("prueba@test.com")
-  await env.RYZE_WAITLIST.delete("amigo1@test.com")
-  return new Response("Limpio ✅ Ya puedes lanzar")
+  try {
+    // @ts-ignore
+    const kv = (globalThis as any).RYZE_WAITLIST || (process.env as any).RYZE_WAITLIST
+    // Si usas Cloudflare binding
+    const binding = (globalThis as any).RYZE_WAITLIST
+    if (binding) {
+       const list = await binding.list()
+       for (const key of list.keys) {
+         await binding.delete(key.name)
+       }
+    }
+    return NextResponse.json({ ok: true, msg: "Lista borrada" })
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: String(e) })
+  }
 }
