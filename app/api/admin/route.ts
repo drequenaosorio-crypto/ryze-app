@@ -2,15 +2,24 @@ import { Redis } from '@upstash/redis'
 const redis = Redis.fromEnv()
 
 export async function GET() {
-  const all = await redis.smembers('waitlist') as string[]
-  const leaderboard = []
+  try {
+    // 1. Agarrar todos los emails
+    const all = await redis.smembers('waitlist') as string[]
+    
+    // 2. Borrar cada lista de referidos
+    for (const email of all) {
+      await redis.del(`waitlist:referrals:${email}`)
+      await redis.del(`waitlist:email:${email}`) // por si guardas datos extra
+    }
 
-  for (const email of all) {
-    const refs = await redis.smembers(`waitlist:referrals:${email}`) as string[]
-    leaderboard.push({ email, count: refs.length, referrals: refs })
+    // 3. Borrar la lista principal
+    await redis.del('waitlist')
+
+    // 4. Borrar leaderboard si existe
+    await redis.del('waitlist:leaderboard')
+
+    return Response.json({ ok: true, msg: `Lista borrada - ${all.length} emails eliminados` })
+  } catch (e: any) {
+    return Response.json({ ok: false, error: e.message }, { status: 500 })
   }
-
-  leaderboard.sort((a,b) => b.count - a.count)
-
-  return Response.json({ total: all.length, leaderboard })
 }
