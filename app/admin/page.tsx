@@ -1,60 +1,73 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function Admin() {
-  const [key, setKey] = useState('')
+export default function AdminPage() {
+  const [auth, setAuth] = useState(false)
+  const [pass, setPass] = useState("")
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
-  const load = async () => {
-    setLoading(true)
-    const res = await fetch(`/api/waitlist?key=${key}`)
+  const loadData = async () => {
+    const res = await fetch('/api/admin')
     const json = await res.json()
     setData(json)
+  }
+
+  useEffect(() => { if(auth) loadData() }, [auth])
+
+  const handleLogin = () => {
+    if(pass === "RYZE2025") setAuth(true)
+    else alert("Clave incorrecta")
+  }
+
+  const handleClean = async () => {
+    const confirm = prompt("⚠️ ESTO BORRARÁ TODOS LOS EMAILS PARA SIEMPRE\n\nEscribe BORRAR para confirmar:")
+    if(confirm!== "BORRAR") return
+
+    setLoading(true)
+    const res = await fetch('/api/clean')
+    const json = await res.json()
+    alert(json.msg)
+    await loadData()
     setLoading(false)
   }
 
-  const downloadCSV = () => {
-    if (!data?.emails) return
-    const csv = "email\n" + data.emails.join("\n")
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `ryze-waitlist-${data.count}.csv`
-    a.click()
+  if(!auth) {
+    return (
+      <div style={{background:'red', minHeight:'100vh', padding:'40px', color:'yellow'}}>
+        <h1>RYZE ADMIN</h1>
+        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Clave" style={{padding:'10px'}}/>
+        <button onClick={handleLogin} style={{padding:'10px', marginLeft:'10px'}}>Entrar</button>
+      </div>
+    )
   }
 
   return (
-    <div style={{background:'#000', color:'#fff', minHeight:'100vh', padding:'40px', fontFamily:'Arial'}}>
-      <h1 style={{color:'#a3ff12'}}>RYZE ADMIN</h1>
-      <p>Total: {data?.count ?? 0} emails</p>
-      
-      {!data?.emails ? (
-        <div style={{marginTop:20}}>
-          <input 
-            type="password" 
-            placeholder="Clave admin" 
-            value={key} 
-            onChange={e=>setKey(e.target.value)}
-            style={{padding:'12px', background:'#222', color:'#fff', border:'1px solid #444', borderRadius:'8px'}}
-          />
-          <button onClick={load} style={{marginLeft:10, padding:'12px 20px', background:'#a3ff12', color:'#000', border:'none', borderRadius:'8px', fontWeight:'bold'}}>
-            {loading ? 'Cargando...' : 'Ver lista'}
-          </button>
-        </div>
-      ) : (
-        <>
-          <button onClick={downloadCSV} style={{margin:'20px 0', padding:'12px 20px', background:'#a3ff12', color:'#000', border:'none', borderRadius:'8px', fontWeight:'bold', cursor:'pointer'}}>
-            Descargar Excel ({data.count})
-          </button>
-          <div style={{background:'#111', padding:'20px', borderRadius:'10px', maxHeight:'60vh', overflow:'auto'}}>
-            {data.emails.map((email:string) => (
-              <div key={email} style={{padding:'8px 0', borderBottom:'1px solid #222'}}>{email}</div>
-            ))}
+    <div style={{background:'red', minHeight:'100vh', padding:'40px', color:'white'}}>
+      <h1 style={{color:'yellow'}}>RYZE ADMIN</h1>
+      <h2>Total: {data?.total || 0} emails</h2>
+
+      <div style={{display:'flex', gap:'15px', marginTop:'20px'}}>
+        <button style={{background:'#a3ff00', color:'red', padding:'15px 25px', fontWeight:'bold', border:'none', borderRadius:'10px'}}>
+          Descargar Excel ({data?.total || 0})
+        </button>
+
+        <button
+          onClick={handleClean}
+          disabled={loading}
+          style={{background:'black', color:'red', padding:'15px 25px', fontWeight:'bold', border:'2px solid red', borderRadius:'10px', cursor:'pointer'}}
+        >
+          {loading? 'Borrando...' : '🗑️ BORRAR TODO'}
+        </button>
+      </div>
+
+      <div style={{marginTop:'30px'}}>
+        {data?.leaderboard?.map((u:any, i:number)=>(
+          <div key={i} style={{background:'rgba(0,0,0,0.3)', padding:'10px', marginBottom:'5px'}}>
+            {i+1}. {u.email} - {u.count} referidos
           </div>
-        </>
-      )}
+        ))}
+      </div>
     </div>
   )
 }
