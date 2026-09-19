@@ -1,25 +1,12 @@
-import { Redis } from '@upstash/redis'
-const redis = Redis.fromEnv()
+import { kv } from '@vercel/kv';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
-  try {
-    // 1. Agarrar todos los emails
-    const all = await redis.smembers('waitlist') as string[]
-    
-    // 2. Borrar cada lista de referidos
-    for (const email of all) {
-      await redis.del(`waitlist:referrals:${email}`)
-      await redis.del(`waitlist:email:${email}`) // por si guardas datos extra
-    }
+  const list = (await kv.get<string[]>('waitlist')) || [];
+  return NextResponse.json({ count: list.length, emails: list });
+}
 
-    // 3. Borrar la lista principal
-    await redis.del('waitlist')
-
-    // 4. Borrar leaderboard si existe
-    await redis.del('waitlist:leaderboard')
-
-    return Response.json({ ok: true, msg: `Lista borrada - ${all.length} emails eliminados` })
-  } catch (e: any) {
-    return Response.json({ ok: false, error: e.message }, { status: 500 })
-  }
+export async function DELETE() {
+  await kv.set('waitlist', []);
+  return NextResponse.json({ success: true });
 }
