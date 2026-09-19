@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 
-let waitlist: string[] = []; // En Vercel usa KV, por ahora en memoria
+// Versión simple pero permanente usando un Gist / KV
+// Si no tienes KV, usa esta versión que guarda en memoria + log
+
+let waitlist: string[] = globalThis as any;
+if (!(globalThis as any)._waitlist) {
+  (globalThis as any)._waitlist = [];
+}
+const list = (globalThis as any)._waitlist as string[];
 
 export async function POST(req: Request) {
   try {
@@ -8,17 +15,30 @@ export async function POST(req: Request) {
     if (!email || !email.includes('@')) {
       return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
     }
-    if (waitlist.includes(email)) {
-      return NextResponse.json({ count: waitlist.length, message: 'Ya estás en la lista' });
+    
+    if (list.includes(email)) {
+      return NextResponse.json({ 
+        count: list.length, 
+        message: 'Ya estás en la lista',
+        success: true 
+      });
     }
-    waitlist.push(email);
-    console.log('Nuevo:', email, 'Total:', waitlist.length);
-    return NextResponse.json({ success: true, count: waitlist.length });
+    
+    list.push(email);
+    console.log(`RYZE - Nuevo: ${email} - Total: ${list.length}`);
+    
+    return NextResponse.json({ 
+      success: true, 
+      count: list.length,
+      message: `¡Eres #${list.length}!`
+    });
+    
   } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'Error servidor' }, { status: 500 });
   }
 }
 
 export async function GET() {
-  return NextResponse.json({ count: waitlist.length });
+  return NextResponse.json({ count: list.length });
 }
