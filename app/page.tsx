@@ -31,12 +31,9 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center pt-32 px-4">
       <h1 className="text-6xl font-black tracking-widest mb-10">RYZE</h1>
-
       <p className="text-xl mb-2">Únete a la lista de espera</p>
       <p className="text-white/50 text-sm mb-6">{count} personas ya se unieron</p>
-
       <div className="flex gap-3 w-full max-w-[350px]">
-        {/* ARREGLADO: text-black para que se vea lo que escribes */}
         <input
           value={email}
           onChange={(e)=>setEmail(e.target.value)}
@@ -47,9 +44,7 @@ export default function Home() {
           Unirme
         </button>
       </div>
-
       {msg && <p className="mt-4 text-[#FFD700] font-bold">{msg}</p>}
-
       <div className="mt-10 border border-yellow-500 rounded-3xl p-6 w-full max-w-[350px] text-center">
         <p className="text-yellow-400 font-black leading-tight">🎁 TRAE A 5 Y RECLAMA AUTOMÁTICAMENTE TU REGALO</p>
         <p className="text-sm mt-3 text-white/90">¡TENEMOS GRANDES SORPRESAS POR LANZAMIENTO!</p>
