@@ -1,26 +1,34 @@
 'use client';
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
-function GraciasContent() {
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email') || '';
-  const link = `https://ryzeofficial-app.com?ref=${encodeURIComponent(email)}`;
+export default function Home() {
+  const [email, setEmail] = useState('');
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    fetch('/api/join').then(r=>r.json()).then(d=>setCount(d.count||0));
+  }, []);
+
+  const handleJoin = async () => {
+    if(!email.includes('@')) return alert('Email inválido');
+    const res = await fetch('/api/join', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ email })
+    });
+    if(res.ok){
+      window.location.href = `/gracias?email=${encodeURIComponent(email)}`;
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 text-center">
-      <h1 className="text-5xl font-black tracking-widest mb-4">RYZE</h1>
-      <h2 className="text-2xl font-bold text-yellow-400 mb-2">¡Ya estás dentro!</h2>
-      <p className="text-white/60 mb-8">Ahora trae a 5 y reclama tu regalo</p>
-      <div className="w-full max-w-sm bg-white/10 border border-yellow-500/50 rounded-2xl p-6">
-        <p className="text-sm text-white/50 mb-2">TU LINK PERSONAL</p>
-        <p className="bg-black p-3 rounded-xl text-sm break-all mb-4">{link}</p>
-        <a href={`https://wa.me/?text=${encodeURIComponent(`Únete a RYZE con mi link: ${link}`)}`} className="block w-full bg-[#25D366] text-black font-black py-4 rounded-2xl text-center">Compartir por WhatsApp</a>
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4">
+      <h1 className="text-6xl font-black tracking-[0.2em] mb-8">RYZE</h1>
+      <p className="text-white/40 text-sm mb-6">{count} personas ya se unieron</p>
+      <div className="flex w-full max-w-[360px] gap-2">
+        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Tu email" className="flex-1 bg-white text-black rounded-2xl px-5 py-4 outline-none" />
+        <button onClick={handleJoin} className="bg-white text-black font-bold rounded-2xl px-6 py-4 shrink-0">Unirme</button>
       </div>
-      <a href="/" className="mt-8 text-white/40 text-sm">Volver al inicio</a>
     </main>
   );
-}
-
-export default function Gracias() {
-  return <Suspense fallback={<div className="min-h-screen bg-black"></div>}><GraciasContent /></Suspense>;
 }
